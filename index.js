@@ -20,15 +20,22 @@ async function getUsers(id){
     // console.log(row);
     return rows
 }
+// get single user 
 async function getUser(id){
     const [rows] = await pool.query(`
     SELECT * 
     from users 
-    where id= ?`,[id])
+    where id= ?`,[id]);
     // return rows
-    return rows[0]
-
+    return rows[0];
 }
-
-const user = await getUser(2)
-console.log(user);
+async function createUser(firstname,lastname,email,password,usertype_id,active){
+const result = await pool.query(
+    `INSERT INTO users (firstname,lastname,email,password,usertype_id,active)
+    VALUES (?,?)
+    `,[firstname,lastname,email,password,usertype_id,active]);
+const id = result.insertId;
+return getUser(id);
+}
+const result = await createUser('Shahid','Khan','shahid@gmail.com','lsdkf',2,1);
+console.log(result);
