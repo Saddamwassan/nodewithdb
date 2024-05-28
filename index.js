@@ -14,28 +14,34 @@ const pool = mysql.createPool(
         // database:'booking_db'  
      }
 ).promise();    
-async function getUsers(id){
+export async function getUsers(id){
     const [rows] = await pool.query('SELECT * from users')
     // const row = result[0];
     // console.log(row);
     return rows
 }
 // get single user 
-async function getUser(id){
+export async function getUser(id){
     const [rows] = await pool.query(`
     SELECT * 
     from users 
-    where id= ?`,[id]);
+    where id= ?`,[id])
     // return rows
     return rows[0];
 }
-async function createUser(firstname,lastname,email,password,usertype_id,active){
-const result = await pool.query(
+export async function createUser(firstname,lastname,email,password,usertype_id,active){
+const [result] = await pool.query(
     `INSERT INTO users (firstname,lastname,email,password,usertype_id,active)
-    VALUES (?,?)
+    VALUES (?,?,?,?,?,?)
     `,[firstname,lastname,email,password,usertype_id,active]);
 const id = result.insertId;
 return getUser(id);
 }
-const result = await createUser('Shahid','Khan','shahid@gmail.com','lsdkf',2,1);
-console.log(result);
+
+// delete user 
+export async function deleteUser(id){
+    const row = await pool.query(`
+    DELETE from users Where id = ?`,[id])
+}
+// const result = await createUser('Tariq','jameel','bilalanwar@gmail.com','lsdkf',"2","1");
+// console.log(result);

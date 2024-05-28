@@ -1,0 +1,3 @@
+nodemon for restarting server on change
+npm i -D nodemon
+put "npx nodemon app.js" into package.json infront of script key.
