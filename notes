@@ -1,3 +1,11 @@
 nodemon for restarting server on change
 npm i -D nodemon
 put "npx nodemon app.js" into package.json infront of script key.
+
+Authentication 
+1.signup
+2.login
+3.forget password
+more...aswell
+
+create an api key or token as the user logins in then give the acces to apis only if he hits the req with that token else not.
