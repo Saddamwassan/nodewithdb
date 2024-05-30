@@ -1,8 +1,6 @@
 import { pool } from '../connection.js'
 export async function getUsers() {
     const [rows] = await pool.query('SELECT * from users')
-    // const row = result[0];
-    // console.log(row);
     return rows
 }
 // get single user 
@@ -10,6 +8,7 @@ export async function getUser(id) {
     const [rows] = await pool.query(`SELECT * from users where id= ?`, [id])
     return rows[0];
 }
+// create user 
 export async function createUser(data) {
     const { firstname, lastname, email, password, usertype_id, active } = data
     const [result] = await pool.query(

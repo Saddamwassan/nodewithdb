@@ -1,3 +1,7 @@
+start with terminal
+npm init -y to make package .json file then change type to module
+then install npm i mysql2 library
+
 nodemon for restarting server on change
 npm i -D nodemon
 put "npx nodemon app.js" into package.json infront of script key.
