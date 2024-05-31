@@ -1,8 +1,8 @@
 import express from 'express'
 const app = express()
-import { getSchedules, getSchedule, createSchedule, updateShcedule, deleteSchedule} from './APIs/schedules/schedules.js';
-import {getUsers,getUser,createUser,deleteUser,updateUser} from './APIs/users/users.js';
-import { getBooking } from './APIs/bookings/bookings.js';
+import {getSchedules, getSchedule, createSchedule, updateShcedule, deleteSchedule} from './APIs/schedules/schedules.js';
+import {getUsers, getUser, createUser, deleteUser, updateUser} from './APIs/users/users.js';
+import {getBookings, createBooking, getBooking, updateBookings, deleteBookings} from './APIs/bookings/bookings.js';
 app.use(express.json());
 
 // api routes for users table************* // sending requests on server 
@@ -12,7 +12,7 @@ app.use(express.json());
         const users = await getUsers()
         res.send(users)
       })
-
+      
       app.get("/users/:id",async (req,res)=>{
         const id = req.params.id
         const user = await getUser(id)
@@ -95,32 +95,32 @@ app.use(express.json());
     // BEGIN :: Booking APIS
     app.get('/bookings',async (req,res)=>{
       const id = req.params.id
-      const schedules = await getBooking();
+      const schedules = await getBookings();
       res.send(schedules);
     })
     
     app.get('/bookings/:id',async (req,res)=>{
       const id = req.params.id;
-      const schedule = await getSchedule(id);
+      const schedule = await getBooking(id);
       res.send(schedule);
     })
 
     app.post("/bookings/create",async (req,res)=>{
       // const {firstname,lastname,email,password,usertype_id,active} = req.body
       const data= req.body
-      await createSchedule(data)
-      res.status(201).send(" User created successfully!")
+      await createBooking(data)
+      res.status(201).send(" Booking created successfully!")
       })
 
       app.put('/bookings/update/:id', async (req, res) => {
         const id = req.params.id;
-        const { fullname,email,message,status_id } = req.body;
+        const { fullname,email,message,status_id} = req.body;
         try {
-            const updateResult = await updateShcedule(fullname,email,message,status_id, id);
+            const updateResult = await updateBookings(fullname,email,message,status_id, id);
             if (updateResult.affectedRows === 0) {
                 res.status(404).send('User not found');
             } else {
-                res.send('Data updated successfully!');
+                res.send('Booking updated!');
             }
         } catch (error) {
             res.status(500).send('An error occurred while updating the user');
@@ -129,8 +129,8 @@ app.use(express.json());
 
       app.delete("/bookings/delete/:id",async (req,res)=>{
         const id = req.params.id
-        deleteSchedule(id);
-        res.status(200).send("deleted successfully!")
+        deleteBookings(id);
+        res.status(200).send("Booking deleted!")
       })
   // END :: Bookings APIS
 // BEGIN :: from express official site for error handling 

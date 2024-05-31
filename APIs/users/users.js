@@ -15,8 +15,8 @@ export async function createUser(data) {
         `INSERT INTO users (firstname,lastname,email,password,usertype_id,active)
         VALUES (?,?,?,?,?,?)
         `, [firstname, lastname, email, password, usertype_id, active]);
-    const id = result.insertId;
-    return getUser(id);
+    // const id = result.insertId;
+    // return getUser(id);
 }
 // update user 
 export async function updateUser(firstname, lastname, email, password, usertype_id, active, id) {
