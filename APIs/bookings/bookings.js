@@ -18,7 +18,7 @@ export async function createBooking(data){
         `, [title ,description, duration, link]);
 }
 // update booking 
-export async function updateBookings(title ,description, duration, link){
+export async function updateBookings(title ,description, duration, link, id){
     try {
         const update = await pool.query(
             `UPDATE bookings SET title = ? ,description = ? ,duration = ? ,link = ? WHERE id = ?`,

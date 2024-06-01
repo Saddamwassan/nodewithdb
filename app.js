@@ -3,6 +3,11 @@ const app = express()
 import {getSchedules, getSchedule, createSchedule, updateShcedule, deleteSchedule} from './APIs/schedules/schedules.js';
 import {getUsers, getUser, createUser, deleteUser, updateUser} from './APIs/users/users.js';
 import {getBookings, createBooking, getBooking, updateBookings, deleteBookings} from './APIs/bookings/bookings.js';
+
+import cors from 'cors';
+
+
+app.use(cors());
 app.use(express.json());
 
 // api routes for users table************* // sending requests on server 
@@ -12,7 +17,7 @@ app.use(express.json());
         const users = await getUsers()
         res.send(users)
       })
-      
+
       app.get("/users/:id",async (req,res)=>{
         const id = req.params.id
         const user = await getUser(id)
@@ -114,9 +119,9 @@ app.use(express.json());
 
       app.put('/bookings/update/:id', async (req, res) => {
         const id = req.params.id;
-        const { fullname,email,message,status_id} = req.body;
+        const { title ,description, duration, link} = req.body;
         try {
-            const updateResult = await updateBookings(fullname,email,message,status_id, id);
+            const updateResult = await updateBookings(title ,description, duration, link, id);
             if (updateResult.affectedRows === 0) {
                 res.status(404).send('User not found');
             } else {
