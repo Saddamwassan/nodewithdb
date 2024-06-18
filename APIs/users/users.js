@@ -1,4 +1,5 @@
-import { pool } from '../connection.js'
+import { pool } from '../connection.js';
+import bcrypt from 'bcrypt';
 export async function getUsers() {
     const [rows] = await pool.query('SELECT * from users')
     return rows
@@ -9,14 +10,13 @@ export async function getUser(id) {
     return rows[0];
 }
 // create user 
-export async function createUser(data) {
+export async function createUser(data){
     const { firstname, lastname, email, password, usertype_id, active } = data
-    const [result] = await pool.query(
+    const hashedPassword = await bcrypt.hash(password,10);
+    pool.query(
         `INSERT INTO users (firstname,lastname,email,password,usertype_id,active)
         VALUES (?,?,?,?,?,?)
-        `, [firstname, lastname, email, password, usertype_id, active]);
-    // const id = result.insertId;
-    // return getUser(id);
+        `, [firstname, lastname, email, hashedPassword, usertype_id, active]);
 }
 // update user 
 export async function updateUser(firstname, lastname, email, password, usertype_id, active, id) {
@@ -32,7 +32,23 @@ export async function updateUser(firstname, lastname, email, password, usertype_
     }
 }
 // delete user 
-export async function deleteUser(id) {
+export async function deleteUser(id){
     const row = await pool.query(`
     DELETE from users Where id = ?`, [id])
+}
+
+export async function loginUser(data){
+  const{email,password} = data;
+  const hashedPassword = await bcrypt.hash(password,10);
+  const [rows] = await pool.query('SELECT * FROM users where email= ? AND password = ? ',[email,hashedPassword]);
+  return rows;
+}
+// store token 
+export async function storeToken(token){
+    pool.query(
+        `INSERT INTO ref_token (token) VALUES (?)`, [token]);
+}
+// delete token 
+export async function deleteToken(){
+    const row = await pool.query(`DELETE FROM ref_token`)
 }

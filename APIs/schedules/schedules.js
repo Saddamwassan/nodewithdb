@@ -12,14 +12,13 @@ export async function getSchedule(id){
 
 // / create schedule 
 export async function createSchedule(data) {
-    const { fullname ,email ,message ,status_id } = data
-    const [result] = await pool.query(
-        `INSERT INTO schedules(fullname,email,message,status_id)
-        VALUES (?,?,?,?)
-        `, [fullname ,email ,message ,status_id ]);
-    // const id = result.insertId;
+        const { fullname, email,schedule_dt, message, status_id} = data
+         pool.query(
+        `INSERT INTO schedules (fullname, email, schedule_dt, message,status_id)
+        VALUES (?,?,?,?,?)
+        `, [ fullname, email, schedule_dt, message, status_id]);
 }
-// update schedule 
+// update schedule  
 export async function updateShcedule(fullname,email,message,status_id,id) {
     try {
         const update = await pool.query(
