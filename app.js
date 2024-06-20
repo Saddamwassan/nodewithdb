@@ -48,21 +48,17 @@ let refreshTokens = [];
 // BEGIN :: from express official site for error handling 
 
 function generateAccessToken(user){
-    return jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'15s'})
-
+    return jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'1m'})
 }
-
-
 
 // BEGIN :: Users APIS
 app.get("/users/list", authenticateToken, async (req, res) => {
   const users = await getUsers();
   // res.send(users);
-  console.log(users);
   res.json(users.filter(user => user.email === req.user.email));
 })
 // authentication middleware 
- function authenticateToken(req, res, next) {
+ function authenticateToken(req, res, next){
   console.log("hi");
   const authHeader = req.headers['authorization']
   const token = authHeader && authHeader.split(' ')[1]
@@ -71,7 +67,7 @@ app.get("/users/list", authenticateToken, async (req, res) => {
   }
   console.log(token);
   console.log("token: ", process.env.ACCESS_TOKEN_SECRET);
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) =>{
     console.log(err);
     if (err) return res.status(401).send("you cannot access data!");
     req.user = user;
@@ -92,7 +88,7 @@ app.post("/users/create", async (req, res) => {
   res.status(201).send(" User created successfully!")
 })
 
-app.put('/users/update/:id', async (req, res) => {
+app.put('/users/update/:id',authenticateToken, async (req, res) => {
   const id = req.params.id;
   const { firstname, lastname, email, password, usertype_id, active } = req.body;
 
@@ -113,14 +109,7 @@ app.delete("/users/delete/:id", async (req, res) => {
   deleteUser(id);
   res.status(200).send("deleted successfully!")
 })
-// // login route 
-//   app.post('/users/login',async (req,res)=>{
-//   const  data= req.body;
-//   const checkUser = await loginUser(data);
-//   const accToken = jwt.sign(data,process.env.ACCESS_TOKEN_SECRET)
-//   res.json({accessToken: accToken})
-//   // res.send(checkUser);
-// })  
+
 // END :: Users APIS
 
 
