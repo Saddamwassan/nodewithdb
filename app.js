@@ -12,7 +12,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // authentication routes 
-// let refreshTokens = [];
+let refreshTokens = [];
     //  routes 
   
     // delete token 
@@ -41,35 +41,35 @@ dotenv.config();
         const checkUser = await loginUser(data);
         const accessToken = generateAccessToken(data);
         const refreshToken = jwt.sign(data,process.env.REFRESH_TOKEN_SECRET);
-        // refreshTokens.push(refreshToken);
-        localStorage.setItem("accessToken",accessToken);
-        localStorage.setItem("refToken",refreshToken);
-        res.json({accessToken: accessToken, refreshToken:refreshToken})
+        refreshTokens.push(refreshToken);
+        res.cookie('accesstoken',accessToken,{
+          httpOnly:true,
+          secure:true,
+          // sameSite:'strict'
+        })
+        res.json({accessToken: accessToken, refreshToken:refreshToken});
       })  
 // BEGIN :: from express official site for error handling 
 
 function generateAccessToken(user){
-    return jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'5m'})
+    return jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'2hr'})
 }
 
 // BEGIN :: Users APIS
 app.get("/users/list", authenticateToken, async (req, res) => {
   const users = await getUsers();
-  // res.send(users);
-  res.json(users.filter(user => user.email === req.user.email));
+  res.send(users);
+  // res.json(users.filter(user => user.email === req.user.email));
 })
 // authentication middleware--------------------------------------------- 
  function authenticateToken(req, res, next){
-  console.log("hi");
   const authHeader = req.headers['authorization']
   const token = authHeader && authHeader.split(' ')[1]
   if (token == null) {
     return res.sendStatus(401);
   }
   console.log(token);
-  console.log("token: ", process.env.ACCESS_TOKEN_SECRET);
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) =>{
-    console.log(user);
     if (err) return res.status(401).send("you cannot access data!");
     if(res.status(401))
     req.user = user;
@@ -77,7 +77,7 @@ app.get("/users/list", authenticateToken, async (req, res) => {
   })
 }
 
-app.get("/users/:id", async (req, res) => {
+app.get("/users/:id",authenticateToken, async (req, res) => {
   const id = req.params.id
   const user = await getUser(id)
   res.send(user)
@@ -106,7 +106,7 @@ app.put('/users/update/:id',authenticateToken, async (req, res) => {
   }
 });
 
-app.delete("/users/delete/:id", async (req, res) => {
+app.delete("/users/delete/:id",authenticateToken, async (req, res) => {
   const id = req.params.id
   deleteUser(id);
   res.status(200).send("deleted successfully!")
@@ -116,13 +116,12 @@ app.delete("/users/delete/:id", async (req, res) => {
 
 
 // BEGIN :: Schedules APIS
-app.get('/schedules', async (req, res) => {
-  const id = req.params.id
+app.get('/schedules',authenticateToken, async (req, res) => {
   const schedules = await getSchedules();
   res.send(schedules);
 })
 
-app.get('/schedules/:id', async (req, res) => {
+app.get('/schedules/:id',authenticateToken, async (req, res) => {
   const id = req.params.id;
   const schedule = await getSchedule(id);
   res.send(schedule);
@@ -135,7 +134,7 @@ app.post("/schedules/create", async (req, res) => {
   res.status(201).send(" Schedule created successfully!")
 })
 
-app.put('/schedules/update/:id', async (req, res) => {
+app.put('/schedules/update/:id',authenticateToken, async (req, res) => {
   const id = req.params.id;
   const { fullname, email, message, status_id } = req.body;
   try {
@@ -150,7 +149,7 @@ app.put('/schedules/update/:id', async (req, res) => {
   }
 });
 
-app.delete("/schedules/delete/:id", async (req, res) => {
+app.delete("/schedules/delete/:id",authenticateToken, async (req, res) => {
   const id = req.params.id
   deleteSchedule(id);
   res.status(200).send("deleted successfully!")
@@ -158,13 +157,13 @@ app.delete("/schedules/delete/:id", async (req, res) => {
 // END :: Schedules APIS
 
 // BEGIN :: Booking APIS
-app.get('/bookings', async (req, res) => {
+app.get('/bookings',authenticateToken, async (req, res) => {
   const id = req.params.id
   const schedules = await getBookings();
   res.send(schedules);
 })
 
-app.get('/bookings/:id', async (req, res) => {
+app.get('/bookings/:id',authenticateToken, async (req, res) => {
   const id = req.params.id;
   const schedule = await getBooking(id);
   res.send(schedule);
@@ -177,7 +176,7 @@ app.post("/bookings/create", async (req, res) => {
   res.status(201).send(" Booking created successfully!")
 })
 
-app.put('/bookings/update/:id', async (req, res) => {
+app.put('/bookings/update/:id',authenticateToken, async (req, res) => {
   const id = req.params.id;
   const { title, description, duration, link } = req.body;
   try {
@@ -192,7 +191,7 @@ app.put('/bookings/update/:id', async (req, res) => {
   }
 });
 
-app.delete("/bookings/delete/:id", async (req, res) => {
+app.delete("/bookings/delete/:id",authenticateToken, async (req, res) => {
   const id = req.params.id
   deleteBookings(id);
   res.status(200).send("Booking deleted!")
