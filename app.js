@@ -1,7 +1,7 @@
 import express from 'express'
 const app = express()
 import { getSchedules, getSchedule, createSchedule, updateShcedule, deleteSchedule } from './APIs/schedules/schedules.js';
-import { getUsers, getUser, createUser, deleteUser, updateUser,loginUser,storeToken,deleteToken} from './APIs/users/users.js';
+import { getUsers, getUser, createUser, deleteUser, updateUser,loginUser,deleteToken} from './APIs/users/users.js';
 import { getBookings, createBooking, getBooking, updateBookings, deleteBookings } from './APIs/bookings/bookings.js';
 
 import cors from 'cors';
@@ -12,7 +12,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // authentication routes 
-let refreshTokens = [];
+// let refreshTokens = [];
     //  routes 
   
     // delete token 
@@ -24,9 +24,9 @@ let refreshTokens = [];
     // refresh token 
     app.post('/token',async (req,res)=>{
       console.log('token api working.')
-      console.log(req.body.refToken)
+      console.log(req.body.refreshToken)
 
-      const refreshToken = req.body.refToken
+      const refreshToken = req.body.refreshToken
       if(refreshToken == null) return res.sendStatus(401)
       if(!refreshTokens.includes(refreshToken)) return res.status(403).send("array does not contain refreshtoken")
       jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET,(err,user)=>{
@@ -41,14 +41,15 @@ let refreshTokens = [];
         const checkUser = await loginUser(data);
         const accessToken = generateAccessToken(data);
         const refreshToken = jwt.sign(data,process.env.REFRESH_TOKEN_SECRET);
-        const saveToken = await storeToken(refreshToken);
-        refreshTokens.push(refreshToken);
+        // refreshTokens.push(refreshToken);
+        localStorage.setItem("accessToken",accessToken);
+        localStorage.setItem("refToken",refreshToken);
         res.json({accessToken: accessToken, refreshToken:refreshToken})
       })  
 // BEGIN :: from express official site for error handling 
 
 function generateAccessToken(user){
-    return jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'1m'})
+    return jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'5m'})
 }
 
 // BEGIN :: Users APIS
@@ -57,7 +58,7 @@ app.get("/users/list", authenticateToken, async (req, res) => {
   // res.send(users);
   res.json(users.filter(user => user.email === req.user.email));
 })
-// authentication middleware 
+// authentication middleware--------------------------------------------- 
  function authenticateToken(req, res, next){
   console.log("hi");
   const authHeader = req.headers['authorization']
@@ -68,8 +69,9 @@ app.get("/users/list", authenticateToken, async (req, res) => {
   console.log(token);
   console.log("token: ", process.env.ACCESS_TOKEN_SECRET);
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) =>{
-    console.log(err);
+    console.log(user);
     if (err) return res.status(401).send("you cannot access data!");
+    if(res.status(401))
     req.user = user;
     next() // next() is used to move on from middleware
   })

@@ -45,10 +45,8 @@ export async function loginUser(data){
 }
 // store token 
 export async function storeToken(token){
-    pool.query(
-        `INSERT INTO ref_token (token) VALUES (?)`, [token]);
+  
 }
 // delete token 
 export async function deleteToken(){
-    const row = await pool.query(`DELETE FROM ref_token`)
 }
